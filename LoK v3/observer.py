@@ -7,15 +7,14 @@ from random import randint
 class Observer(Game):
     def __init__(self):
         self.data = Data()
-        self.traversed_rows = self.data.data_dict["traversed_rows"]
-        self.inventory = self.data.data_dict["inventory"]
-        self.endings = self.data.data_dict["endings"]
         super().__init__(cfg.GAMEFILE)
-        self.game = False
-        self.backpack_obj = Backpack(cfg.BP_COORDS, self.inventory)
-        self.settings_obj = None
-        self.active_objs = {"backpack":[]}
         starting_nodes = self.get_option_objs(self.data.data_dict["option"])
+        self.traversed_rows = self.data.data_dict["traversed_rows"]
+        self.endings = self.data.data_dict["endings"]
+        self.backpack_obj = Backpack(cfg.BP_COORDS, self.data.data_dict["inventory"])
+        self.settings_obj = None
+        self.game = False
+        self.active_objs = {"backpack":[]}
         self.update_active_objs("nodes", starting_nodes)
 
     def update_active_objs(self, key, value):
@@ -47,14 +46,13 @@ class Observer(Game):
 
     def inventory_check(self, node):
         if node.data.incoming != None:
-            self.inventory.append(node.data.incoming)
+            self.backpack_obj.inventory.append(self.backpack_obj.items[node.data.incoming])
         if node.data.leaving != None:
-            self.inventory.remove(node.data.leaving)
+            self.backpack_obj.inventory.remove(self.backpack_obj.items[node.data.leaving])
         self.backpack_obj.update_inventory()
 
     def next_nodes(self, node):
         self.traversed_rows.append(node.row_id)
-        print(len(node.get_children()))
         if len(node.get_children()) == 1:
             next_node = node.get_children()[0]
             next_node.get_text_box()
@@ -64,8 +62,9 @@ class Observer(Game):
             next_id = self.conditional_check(node.data.conditionals, node.data.destination)
             next_nodes = self.get_option_objs(next_id)
             node.button, node.text_box = None, None
-            node.get_last_text_box()
-            next_nodes.append(node)
+            if len(next_nodes) > 1:
+                node.get_last_text_box()
+                next_nodes.append(node)
             self.update_active_objs("nodes", next_nodes)
         self.data.save()
 

@@ -6,12 +6,12 @@ import pygame as pg
 
 class Backpack(Interactable):
     def __init__(self, coords, inventory):
-        super().__init__(pg.Rect(coords), self.on_press)
+        super().__init__(pg.Rect(coords), self.on_press, trigger = [pg.MOUSEBUTTONDOWN, pg.K_b])
         self.state = "closed"
-        self.inventory = inventory
         self.bp_img = ImageProcessor("backpack", h=cfg.BP_HEIGHT, x=cfg.BP_X, y=cfg.BP_Y)
         self.ribbon = Ribbon(self)
-        self.items = [RibbonItem(item, ImageProcessor(item)) for item in cfg.RIBBON_ITEM]
+        self.items = {item:RibbonItem(item, ImageProcessor(item, h=cfg.ITEM_HEIGHT)) for item in cfg.RIBBON_ITEM}
+        self.inventory = inventory
 
     def on_press(self, arg):
         if self.state == "closed" or self.state == "closing":
@@ -24,101 +24,87 @@ class Backpack(Interactable):
             case "closed":
                 return
             case "closing":
-                if self.ribbon.pieces[0].piece.x >= cfg.RIBBON_START_X:
+                if self.ribbon.ribbon_img.x >= cfg.RIBBON_START_X:
                     self.state = "closed"
                     return
-                for ribbon_piece in self.ribbon.pieces:
-                    ribbon_piece.piece.x += cfg.RIBBON_SPEED
-                    if ribbon_piece.piece.x > cfg.RIBBON_START_X and ribbon_piece in self.ribbon.active_pieces:
-                        self.ribbon.active_pieces.remove(ribbon_piece)  
+                self.ribbon.ribbon_img.x += cfg.RIBBON_SPEED
+                for item in self.inventory:
+                    item.item_img.x += cfg.RIBBON_SPEED
             case "openned":
-                if self.ribbon.pieces[0].piece.x > self.ribbon.min_x:
-                    for ribbon_piece in self.ribbon.pieces:
-                        ribbon_piece.piece.x -= cfg.RIBBON_SPEED
-                        if ribbon_piece.piece.x > cfg.RIBBON_START_X and ribbon_piece not in self.ribbon.active_pieces:
-                            self.ribbon.active_pieces.append(ribbon_piece)
-                if self.ribbon.pieces[0].piece.x < self.ribbon.min_x:
-                    for ribbon_piece in self.ribbon.pieces:
-                        ribbon_piece.piece.x += cfg.RIBBON_SPEED
-                        if ribbon_piece.piece.x > cfg.RIBBON_START_X and ribbon_piece in self.ribbon.active_pieces:
-                            self.ribbon.active_pieces.remove(ribbon_piece)
+                if self.ribbon.ribbon_img.x > self.ribbon.min_x:
+                    self.ribbon.ribbon_img.x -= cfg.RIBBON_SPEED
+                    for item in self.inventory:
+                        item.item_img.x -= cfg.RIBBON_SPEED             
+                if self.ribbon.ribbon_img.x < self.ribbon.min_x:
+                    self.ribbon.ribbon_img.x += cfg.RIBBON_SPEED
+                    for item in self.inventory:
+                        item.item_img.x += cfg.RIBBON_SPEED
             case "openning":
-                if self.ribbon.pieces[0].piece.x <= self.ribbon.min_x:
+                if self.ribbon.ribbon_img.x <= self.ribbon.min_x:
                     self.state = "openned"
                     return
-                for ribbon_piece in self.ribbon.pieces:
-                    ribbon_piece.piece.x -= cfg.RIBBON_SPEED
-                    if ribbon_piece.piece.x < cfg.RIBBON_START_X and ribbon_piece not in self.ribbon.active_pieces:
-                        self.ribbon.active_pieces.append(ribbon_piece)
+                self.ribbon.ribbon_img.x -= cfg.RIBBON_SPEED
+                for item in self.inventory:
+                    item.item_img.x -= cfg.RIBBON_SPEED
 
     def update_inventory(self):
-        self.ribbon.unassign_pieces()
         self.ribbon.assign_pieces()
 
     def blit(self, target):
-        for piece in self.ribbon.active_pieces:
-            piece.blit(target)
+        if self.ribbon.ribbon_img.x <= cfg.RIBBON_START_X:
+            self.ribbon.blit(target)
+        active_items = []
+        for item in self.inventory:
+            if item.item_img.x < cfg.RIBBON_START_X:
+                backpack_end_x = int((cfg.RIBBON_START_X + (self.bp_img.w-(cfg.RIBBON_START_X-self.bp_img.x))) * 0.95)
+                if (item.item_img.x + item.item_img.w) > backpack_end_x:
+                    width = backpack_end_x-item.item_img.x
+                    subsurf = item.item_img.img.subsurface((0,0,width,item.item_img.h))
+                    subsurf_rect = subsurf.get_rect()
+                    subsurf_rect.x, subsurf_rect.y, = item.item_img.x, item.item_img.y
+                    target.blit(subsurf, subsurf_rect)
+                else:
+                    item.item_img.blit(target)
+                    active_items.append(item)
         self.bp_img.blit(target)
+        [item.mouse_check(target) for item in active_items]
         self.update_ribbon()
+
 
 class Ribbon:
     def __init__(self, bp):
         self.bp = bp
-        self.pieces = [RibbonPiece(ImageProcessor("ribbon1",h=cfg.RIBBON_HEIGHT,x=cfg.RIBBON_START_X,y=cfg.RIBBON_Y))]
-        self.active_pieces = []
-        for i in range(len(cfg.RIBBON_ITEM)):
-            x = sum([ribbon.piece.w for ribbon in self.pieces]) + cfg.RIBBON_START_X
-            if i % 2 == 0:
-                self.pieces.append(RibbonPiece(ImageProcessor("ribbon3", h=cfg.RIBBON_HEIGHT, x=x, y=cfg.RIBBON_Y)))
-            elif i % 2 == 1:
-                self.pieces.append(RibbonPiece(ImageProcessor("ribbon2", h=cfg.RIBBON_HEIGHT, x=x, y=cfg.RIBBON_Y)))
+        self.ribbon_img = ImageProcessor("bigribbon",h=cfg.RIBBON_HEIGHT,x=cfg.RIBBON_START_X,y=cfg.RIBBON_Y)
+        self.parts = self.ribbon_img.w / 10
 
     @property
     def min_x(self):
         # returns maximum x relative to the length of the inventory
-        return cfg.RIBBON_START_X - sum([ribbon.piece.w for ribbon in self.pieces[:(len(self.bp.inventory)) + 1]])
-
+        return cfg.RIBBON_START_X - (len(self.bp.inventory)+1) * self.parts
+    
     def assign_pieces(self):
         for index, item in enumerate(self.bp.inventory):
-            self.pieces[index+1].assign_item(self.bp.items[item])
+            item.item_img.x = self.ribbon_img.x + (index) * self.parts + self.parts/2
 
-    def unassign_pieces(self):
-        for i in range(len(self.pieces)):
-            if i != len(self.pieces)-1:
-                self.pieces[i+1].unassign_item()
+    def blit(self, target):
+        width = cfg.RIBBON_START_X - self.ribbon_img.x
+        subsurf = self.ribbon_img.img.subsurface((0, 0, width, self.ribbon_img.h))
+        subsurf_rect = pg.Rect(self.ribbon_img.x, self.ribbon_img.y, width, self.ribbon_img.h)
+        target.blit(subsurf, subsurf_rect)
 
-class RibbonPiece:
-    def __init__(self, piece):
-        self.piece = piece
-        self.item = None
 
-    def assign_item(self, item):
-        self.item = item
-        self.center_item()
-
-    def unassign_item(self):
-        self.item = None
-
-    def center_item(self):
-        self.item.y = int(cfg.RIBBON_CENTER - self.item.item.h / 2)
-        self.item.x = int(self.piece.x + (self.piece.w - self.item.item.w) / 2)
-
-    def blit(self, source):
-        self.piece.blit(source)
-        if self.item != None:
-            self.center_item()
-            self.item.item_img.blit(source)
-
-class RibbonItem(Interactable):
+class RibbonItem:
     def __init__(self, text, item):
-        self.text = TextProcessor(text, "center", 100, 100, 0, 0, adjust=True, font_size=10, text_margin=0, box_color=cfg.BLACK, opacity = 100)
+        self.raw_text = text
+        self.text = TextProcessor(text, "center", 100, 100, 0, 0, adjust=True, font_size=12, text_margin=0, box_color=cfg.BLACK, opacity = 100)
         self.item_img = item
+        self.item_img.y = int(cfg.RIBBON_CENTER - self.item_img.h / 2)
 
     def __repr__(self):
-        return self.text
+        return self.raw_text
 
-    def event(self, event, observer):
+    def mouse_check(self, target):
         x, y = pg.mouse.get_pos()
-        if self.item.rect.collidepoint((x,y)):
-            self.text.rect.topleft = x, y
-            observer.active_objs["temp"].append(self.text)
+        if self.item_img.rect.collidepoint((x, y)):
+            self.text.obj_rect.topleft = (x, y)
+            self.text.blit(target)

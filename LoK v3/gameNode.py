@@ -20,7 +20,7 @@ class GameNode(Interactable):
         self.text_box = TextBox(TextProcessor(self.data.text, "left", cfg.DEFAULT_TEXT_BOX[2] / 1.015, cfg.DEFAULT_TEXT_BOX[3] / 1.02, cfg.DEFAULT_TEXT_BOX[2] * 0.7, cfg.DEFAULT_TEXT_BOX[3] * 0.7, adjust=True, scroll=True, opacity = 100))
 
     def get_button(self, next_nodes):
-        self.button = Button(TextProcessor(self.data.text, "center", self.button_dimension[0], self.button_dimension[1], self.button_dimension[2], self.button_dimension[3], box=self.box_dimension), next_nodes, args=self)
+        self.button = Button(TextProcessor(self.data.text, "center", self.button_dimension[0], self.button_dimension[1], self.button_dimension[2], self.button_dimension[3], box=self.box_dimension, opacity = 200), next_nodes, args=self, trigger=self.trigger)
 
     def get_last_text_box(self):
         self.last_text_box = TextProcessor(self.data.text, "center", cfg.LAST_TEXT_BOX[2] / 1.015, cfg.LAST_TEXT_BOX[3] / 1.02, cfg.LAST_TEXT_BOX[2] * 0.7, cfg.LAST_TEXT_BOX[3] * 0.7, box = cfg.LAST_TEXT_BOX, opacity = 100)

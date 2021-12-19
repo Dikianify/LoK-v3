@@ -63,7 +63,6 @@ class TextProcessor(DisplayObject):
         if self.adjust==True:
             self.box_adjust(width + self.text_margin * 2, height + self.text_margin * 2)
         self.text_box = pygame.Rect(0, 0, width, height)
-        self.text_box.center = self.obj_rect.center
 
         # creates ui surface to blit text onto. Make sure you blit alpha before adding text!
         surf = pygame.Surface((self.obj_rect.size)).convert_alpha()
@@ -74,6 +73,7 @@ class TextProcessor(DisplayObject):
     def get_text_objects(self):
         # get an updated list of text objects to blit onto the text box
         text_list = self.scroll_check()
+        self.text_box.center = self.obj_rect.center
 
         text_obj_list = []              
         for index, lineText in enumerate(text_list):

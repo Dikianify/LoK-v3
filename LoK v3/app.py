@@ -22,7 +22,6 @@ class App():
         self.DISPLAY_SURF.fill(cfg.BG_COLOR)
         event_list = []
         for event in pygame.event.get():
-            print(event)
             event_list.append(event)
         for obj_list in self.observer.active_objs.values():
             for obj in obj_list:

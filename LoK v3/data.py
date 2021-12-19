@@ -16,6 +16,10 @@ class Data:
 
     def save(self):
         with open("savegame", "wb") as f:
+            inv = []
+            for I in self.data_dict["inventory"]:
+                inv.append(I.__repr__())
+            self.data_dict["inventory"] = inv
             pickle.dump([self.data_dict], f)
 
     def load(self):

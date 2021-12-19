@@ -10,17 +10,17 @@ class Interactable:
         self.args = args
 
     def event(self, event, observer):
-        if event.type in self.trigger:
-            try:
-                if self.obj_rect.collidepoint(event.pos):
-                    self.func(self.args)
-            except:
+        if event.type != pygame.KEYUP and event.type in self.trigger:
+            if self.obj_rect.collidepoint(event.pos):
+                self.func(self.args)
+        elif event.type == pygame.KEYUP:
+            if event.key in self.trigger:
                 self.func(self.args)
 
 
 class Button(Interactable):
-    def __init__(self, text_obj, func, args=None):
-        super().__init__(text_obj.obj_rect, func, args=args)
+    def __init__(self, text_obj, func, args=None, trigger = [pygame.MOUSEBUTTONDOWN]):
+        super().__init__(text_obj.obj_rect, func, args=args, trigger = trigger)
         self.text_obj = text_obj
         self.text_objs = text_obj.get_text_objects()
 
@@ -31,7 +31,7 @@ class Button(Interactable):
 class TextBox(Interactable):
     def __init__(self, text_obj):
         self.text_obj = text_obj
-        super().__init__(pygame.Rect(0, 0, cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT), self.end_scroll, trigger=[pygame.MOUSEBUTTONDOWN, pygame.KEYUP])
+        super().__init__(pygame.Rect(0, 0, cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT), self.end_scroll, trigger=[pygame.MOUSEBUTTONDOWN, pygame.K_SPACE, pygame.K_RETURN])
 
     def blit(self, target):
         self.text_obj.blit(target)
