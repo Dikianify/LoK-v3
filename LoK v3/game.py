@@ -3,6 +3,7 @@ import config as cfg
 from textProcessor import TextProcessor
 from interactable import Button
 from gameNode import GameNode, CellData
+import os
 
 class Game:
     def __init__(self, gamefile):

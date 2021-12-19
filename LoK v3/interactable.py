@@ -11,8 +11,12 @@ class Interactable:
 
     def event(self, event, observer):
         if event.type in self.trigger:
-            if self.obj_rect.collidepoint(event.pos):
+            try:
+                if self.obj_rect.collidepoint(event.pos):
+                    self.func(self.args)
+            except:
                 self.func(self.args)
+
 
 class Button(Interactable):
     def __init__(self, text_obj, func, args=None):
@@ -23,15 +27,14 @@ class Button(Interactable):
     def blit(self, target):
         self.text_obj.blit(target)
 
+
 class TextBox(Interactable):
     def __init__(self, text_obj):
         self.text_obj = text_obj
-        super().__init__(pygame.Rect(0, 0, cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT), self.end_scroll, trigger=[pygame.MOUSEBUTTONDOWN, pygame.K_SPACE])
+        super().__init__(pygame.Rect(0, 0, cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT), self.end_scroll, trigger=[pygame.MOUSEBUTTONDOWN, pygame.KEYUP])
 
     def blit(self, target):
         self.text_obj.blit(target)
 
     def end_scroll(self, arg):
-        self.text_obj.scroll = False
-
-    
+        self.text_obj.scroll = False   

@@ -19,5 +19,8 @@ class Data:
             pickle.dump([self.data_dict], f)
 
     def load(self):
-        with open("savegame", "rb") as f:
-            self.data_dict = pickle.load(f)
+        try:
+            with open("savegame", "rb") as f:
+                self.data_dict = pickle.load(f)
+        except:
+            return None

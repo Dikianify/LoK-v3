@@ -3,8 +3,6 @@ from backpack import Backpack
 import config as cfg
 from data import Data
 from random import randint
-from textProcessor import TextProcessor
-from interactable import Button
 
 class Observer(Game):
     def __init__(self):
