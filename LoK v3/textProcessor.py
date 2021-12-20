@@ -82,7 +82,7 @@ class TextProcessor(DisplayObject):
             y = self.text_box.top
             if self.alignment=="center":
                 x = self.text_box.center[0]
-                line_rect.center = x, y + round(((self.font.size("Tg")[1] + 1) * index) + self.font.size("Tg")[1] / 2)
+                line_rect.center = x, y + round((self.font.size("Tg")[1] * index) + self.font.size("Tg")[1] / 2.2)
             else:
                 x = self.text_box.left
                 line_rect.topleft = x, y + round(((self.font.size("Tg")[1] + 1) * index))
@@ -107,6 +107,10 @@ class TextProcessor(DisplayObject):
                         return new_text_list
                 return new_text_list
         return self.text_list
+
+    def reset_scroll(self):
+        self.scroll = True
+        self.scroll_count = 0
 
 
     @property

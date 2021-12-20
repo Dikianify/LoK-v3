@@ -1,5 +1,6 @@
 from interactable import Interactable, Button, TextBox
 from textProcessor import TextProcessor
+import pygame as pg
 import config as cfg
 
 class GameNode(Interactable):
@@ -17,13 +18,16 @@ class GameNode(Interactable):
         self.last_text_box_bool = False
 
     def get_text_box(self):
-        self.text_box = TextBox(TextProcessor(self.data.text, "left", cfg.DEFAULT_TEXT_BOX[2] / 1.015, cfg.DEFAULT_TEXT_BOX[3] / 1.02, cfg.DEFAULT_TEXT_BOX[2] * 0.7, cfg.DEFAULT_TEXT_BOX[3] * 0.7, adjust=True, scroll=True, opacity = 100))
+        if self.text_box == None:
+            self.text_box = TextBox(TextProcessor(self.data.text, "left", cfg.DEFAULT_TEXT_BOX[2] / 1.015, cfg.DEFAULT_TEXT_BOX[3] / 1.02, cfg.DEFAULT_TEXT_BOX[2] * 0.7, cfg.DEFAULT_TEXT_BOX[3] * 0.7, adjust=True, scroll=True, opacity = 100))
+        else:
+            self.text_box.text_obj.reset_scroll()
 
     def get_button(self, next_nodes):
         self.button = Button(TextProcessor(self.data.text, "center", self.button_dimension[0], self.button_dimension[1], self.button_dimension[2], self.button_dimension[3], box=self.box_dimension, opacity = 200), next_nodes, args=self, trigger=self.trigger)
 
     def get_last_text_box(self):
-        self.last_text_box = TextProcessor(self.data.text, "center", cfg.LAST_TEXT_BOX[2] / 1.015, cfg.LAST_TEXT_BOX[3] / 1.02, cfg.LAST_TEXT_BOX[2] * 0.7, cfg.LAST_TEXT_BOX[3] * 0.7, box = cfg.LAST_TEXT_BOX, opacity = 100)
+        return TextProcessor(self.data.text, "center", cfg.LAST_TEXT_BOX[2] / 1.025, cfg.LAST_TEXT_BOX[3] / 1.05, cfg.LAST_TEXT_BOX[2] * 0.7, cfg.LAST_TEXT_BOX[3] * 0.7, box = cfg.LAST_TEXT_BOX, opacity = 100)
 
     def add_child(self, child_node):
         self.children.append(child_node)
@@ -72,3 +76,76 @@ class CellData:
         self.noise = noise
         self.bg = bg
         self.music = music
+
+
+class EndNode(Interactable):
+    BUTTON_WIDTH = round(cfg.WINDOW_WIDTH / 3)
+    BUTTON_MARGIN = round((cfg.WINDOW_WIDTH - BUTTON_WIDTH * 2) / 3)
+    BUTTON_DIMENSION = BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425
+    button1_box_dimension = (BUTTON_MARGIN, cfg.BUTTON_Y, BUTTON_WIDTH, cfg.BUTTON_BASE_HEIGHT)
+    button2_box_dimension = (BUTTON_WIDTH + BUTTON_MARGIN * 2, cfg.BUTTON_Y, BUTTON_WIDTH, cfg.BUTTON_BASE_HEIGHT)
+    def __init__(self, get_option_objs, update_active_objs, main_menu_node):
+        self.get_option_objs, self.update_active_objs = get_option_objs, update_active_objs
+        self.main_menu_node = main_menu_node
+        self.buttons = [
+        Button(TextProcessor("Restart", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200), self.restart, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
+        Button(TextProcessor("Main Menu", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension,opacity=200), self.main_menu, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
+        ]
+
+    def event(self, event, observer):
+        for button in self.buttons:
+            button.event(event, observer)
+
+    def blit(self, target):
+        self.end_text_box.blit(target)
+        for button in self.buttons:
+            button.blit(target)
+
+    def restart(self, arg):
+        self.update_active_objs("nodes", self.get_option_objs("0"))
+
+    def main_menu(self, arg):
+        self.get_option_objs("0")
+        self.update_active_objs("nodes", [self.main_menu_node])
+
+    def get_end_text_box(self, end):
+        self.end_text_box =TextProcessor(end, "center", cfg.LAST_TEXT_BOX[2] / 1.025, cfg.LAST_TEXT_BOX[3] / 1.05, cfg.LAST_TEXT_BOX[2] * 0.7, cfg.LAST_TEXT_BOX[3] * 0.7, box = cfg.LAST_TEXT_BOX, opacity = 100, font_size = 10)
+
+class HellEndNode(EndNode):
+    def __init__(self, get_option_objs, update_active_objs, main_menu_node):
+        super().__init__(get_option_objs, update_active_objs, main_menu_node)
+        self.buttons[0] = Button(TextProcessor("Try Again", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200), self.try_again, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1])
+
+    def try_again(self, arg):
+        self.update_active_objs("nodes", self.get_option_objs("706"))
+
+class StartNode(Interactable):
+    BUTTON_WIDTH = round(cfg.WINDOW_WIDTH / 3)
+    BUTTON_MARGIN = round((cfg.WINDOW_WIDTH - BUTTON_WIDTH * 2) / 3)
+    BUTTON_DIMENSION = BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425
+    button1_box_dimension = (BUTTON_MARGIN, cfg.BUTTON_Y, BUTTON_WIDTH, cfg.BUTTON_BASE_HEIGHT)
+    button2_box_dimension = (BUTTON_WIDTH + BUTTON_MARGIN * 2, cfg.BUTTON_Y, BUTTON_WIDTH, cfg.BUTTON_BASE_HEIGHT)
+    def __init__(self, get_option_objs, update_active_objs, data):
+        self.get_option_objs, self.update_active_objs = get_option_objs, update_active_objs
+        self.data = data
+        self.buttons = [
+        Button(TextProcessor("Continue", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension, opacity=200), self.continue_game, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
+        Button(TextProcessor("New Game", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension, opacity=200), self.new_game, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
+        ]   
+
+    def event(self, event, observer):
+        for button in self.buttons:
+            button.event(event, observer)
+
+    def blit(self, target):
+        for button in self.buttons:
+            button.blit(target)   
+
+    def continue_game(self, arg):
+        self.update_active_objs("nodes", self.get_option_objs(self.data.data_dict["option"]))
+
+    def new_game(self, arg):
+        self.data.data_dict["option"] = "0"
+        self.data.data_dict["traversed_rows"] = []
+        self.data.data_dict["inventory"] = []
+        self.update_active_objs("nodes", self.get_option_objs(self.data.data_dict["option"]))
