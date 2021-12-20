@@ -31,8 +31,12 @@ class ImageProcessor(DisplayObject):
         # output:
         #   img - transformed image
 
-        file = os.path.join("data", "assets", self.name + ".png")
-        image = pg.image.load(file).convert_alpha()
+        try:
+            file = os.path.join("data", "assets", self.name + ".png")
+            image = pg.image.load(file).convert_alpha()
+        except:
+            file = os.path.join("data", "bgs", self.name + ".png")
+            image = pg.image.load(file).convert_alpha()
         h = image.get_height() if h == None else h
         img_w, img_h = pg.Surface.get_width(image), pg.Surface.get_height(image)
         w = int(h / img_h * img_w)

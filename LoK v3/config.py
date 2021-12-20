@@ -11,7 +11,7 @@ def install(package):
 
 GAMEFILE = "LoK text.xlsx"
 
-WINDOW_WIDTH = 640
+WINDOW_WIDTH = 960
 WINDOW_HEIGHT = 480
 FPS = 30
 

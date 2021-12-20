@@ -9,7 +9,7 @@ class Data:
             self.data_dict = {
                 
                 "text_box_color":cfg.TEXT_BOX_COLOR,"text_color":cfg.TEXT_COLOR,"button_color":cfg.BUTTON_COLOR,
-                "inventory":[],"traversed_rows":[],"endings":[],"option":"0"
+                "inventory":[],"backpack":False,"traversed_rows":[],"endings":[],"option":"0","last_text":""
                 
                 }
             self.save()
@@ -25,6 +25,6 @@ class Data:
     def load(self):
         try:
             with open("savegame", "rb") as f:
-                self.data_dict = pickle.load(f)
+                return pickle.load(f)[0]
         except:
             return None
