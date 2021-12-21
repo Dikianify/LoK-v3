@@ -4,9 +4,10 @@ import config as cfg
 from displayObject import DisplayObject
 
 class ImageProcessor(DisplayObject):
-    def __init__(self, name, h=None, x = 0, y = 0):
+    def __init__(self, name, h=None, x = 0, y = 0, max_w=None):
         self.name = name
         self.path = os.path.join("data/assets", name)
+        self.max_w = max_w
         self.img = self.image_setup(self.path, h).convert_alpha()
         super().__init__((x, y, self.img.get_width(), self.img.get_height()))
 
@@ -41,6 +42,11 @@ class ImageProcessor(DisplayObject):
         img_w, img_h = pg.Surface.get_width(image), pg.Surface.get_height(image)
         w = int(h / img_h * img_w)
         w, h = self.get_ribbon_item_dim(image, h, img_h, img_w) if name in cfg.RIBBON_ITEM else w, h
+        if self.max_w != None:
+            if w > self.max_w:
+                scale = w / self.max_w
+                h = h / scale
+                w = self.max_w
         return self.fit(image, w, h)     
 
     def get_ribbon_item_dim(self, h, img_h, img_w):

@@ -9,6 +9,7 @@ class Data:
             self.data_dict = {
                 
                 "text_box_color":cfg.TEXT_BOX_COLOR,"text_color":cfg.TEXT_COLOR,"button_color":cfg.BUTTON_COLOR,
+                "music_vol":100, "effect_vol":100,
                 "inventory":[],"backpack":False,"traversed_rows":[],"endings":[],"option":"0","last_text":""
                 
                 }
@@ -16,10 +17,6 @@ class Data:
 
     def save(self):
         with open("savegame", "wb") as f:
-            inv = []
-            for I in self.data_dict["inventory"]:
-                inv.append(I.__repr__())
-            self.data_dict["inventory"] = inv
             pickle.dump([self.data_dict], f)
 
     def load(self):

@@ -10,8 +10,13 @@ class Backpack(Interactable):
         self.state = "closed"
         self.bp_img = ImageProcessor("backpack", h=cfg.BP_HEIGHT, x=cfg.BP_X, y=cfg.BP_Y)
         self.ribbon = Ribbon(self)
-        self.items = {item:RibbonItem(item, ImageProcessor(item, h=cfg.ITEM_HEIGHT)) for item in cfg.RIBBON_ITEM}
-        self.inventory = inventory
+        self.items = {item:RibbonItem(item, ImageProcessor(item, h=cfg.ITEM_HEIGHT, max_w = self.ribbon.parts)) for item in cfg.RIBBON_ITEM}
+        self.str_inventory = inventory
+        self.update_inventory()
+
+    @property
+    def inventory(self):
+        return [self.items[item] for item in self.str_inventory]
 
     def on_press(self, arg):
         if self.state == "closed" or self.state == "closing":
@@ -84,7 +89,7 @@ class Ribbon:
     
     def assign_pieces(self):
         for index, item in enumerate(self.bp.inventory):
-            item.item_img.x = self.ribbon_img.x + (index) * self.parts + self.parts/2
+            item.item_img.x = self.ribbon_img.x + (index * (self.parts)) + self.parts/2 + (self.parts/2 - item.item_img.w/2)
 
     def blit(self, target):
         width = cfg.RIBBON_START_X - self.ribbon_img.x
