@@ -139,6 +139,8 @@ class EndNode(Interactable):
         next_nodes = self.get_option_objs("0")
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)
+        self.update_active_objs("backgrounds", [next_nodes[0].render_background()])
+        self.update_active_objs("models", next_nodes[0].render_models())
         self.game_data.data_dict["backpack"] = False
         self.game_data.data_dict["traversed_rows"] = []
 
@@ -147,6 +149,7 @@ class EndNode(Interactable):
         self.game_data.data_dict["backpack"] = False
         self.main_menu_node.reset_buttons()
         self.update_active_objs("nodes", [self.main_menu_node])
+        self.update_active_objs("background", [self.main_menu_node.render_background()])
 
     def render_background(self):
         return ImageProcessor(self.game_data.data_dict["endings"][-1][7], h=cfg.WINDOW_HEIGHT, base="bgs")
@@ -162,10 +165,18 @@ class HellEndNode(EndNode):
         super().__init__(get_option_objs, update_active_objs, update_sounds, main_menu_node, data, win_node = win_node)
         self.buttons[0] = Button(TextProcessor("Try Again", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200), self.try_again, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1])
 
+    def reset_buttons(self):
+        self.buttons = [
+        Button(TextProcessor("Try Again", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200,box_color = self.game_data.data_dict["box_color"]), self.try_again, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
+        Button(TextProcessor("Main Menu", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension,opacity=200,box_color = self.game_data.data_dict["box_color"]), self.main_menu, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
+        ]     
+
     def try_again(self, arg):
         next_nodes = self.get_option_objs("706")
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)
+        self.update_active_objs("backgrounds", [next_nodes[0].render_background()])
+        self.update_active_objs("models", next_nodes[0].render_models())
 
 class StartNode(Interactable):
     BUTTON_WIDTH = round(cfg.WINDOW_WIDTH / 3)
