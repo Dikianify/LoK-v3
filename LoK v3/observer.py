@@ -51,9 +51,15 @@ class Observer(Game):
                     if randint(1,5) % 2 == 0:
                         return cond[1]
                     else:
-                        return cond[0][1:]        
+                        return cond[0][1:]    
+                case "j":
+                    ran_int = randint(1,3)
+                    if ran_int == 1:
+                        return cond[0][1:]
+                    else:
+                        return cond[ran_int-1]    
                 case "f":
-                    for row in self.traversed_rows:
+                    for row in self.data.data_dict["traversed_rows"]:
                         if row >= 142:
                             self.traversed_rows.remove(row)
                         if "bone" in self.data.data_dict["inventory"]:
@@ -111,10 +117,10 @@ class Observer(Game):
                 if len(next_nodes) > 1:
                     next_nodes[0].last_text_box = node.get_last_text_box(self.data.data_dict["box_color"])
                     self.data.data_dict["last_text"] = node.data.text
+                self.update_active_objs("models", next_nodes[0].render_models())
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)
         self.update_active_objs("background", [next_nodes[0].render_background()])
-        self.update_active_objs("models", next_nodes[0].render_models())
         self.data.save()
 
     def update_sounds(self, music, sound):
