@@ -9,10 +9,16 @@ class MusicPlayer:
 
     def set_music_volume(self, val):
         self.music_volume = val
-        pg.mixer.music.set_volume(val)
+        pg.mixer.music.set_volume(val/100)
+
+    def get_music_volume(self):
+        return self.music_volume
 
     def set_effect_volume(self, val):
         self.effect_volume = val
+
+    def get_effect_volume(self):
+        return self.effect_volume
 
     def set_music(self, mus):
         if self.music != mus:
@@ -23,5 +29,5 @@ class MusicPlayer:
 
     def play_sound(self, sound):
         sound_effect = pg.mixer.Sound(os.path.join("data", "sounds", "noises", sound + ".mp3"))
-        sound_effect.set_volume(self.effect_volume)
+        sound_effect.set_volume(self.effect_volume/100)
         pg.mixer.effect.play()

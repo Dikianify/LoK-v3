@@ -11,6 +11,7 @@ class App():
 
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         pygame.display.set_caption('Legend of Kira')
 
         self.DISPLAY_SURF = pygame.display.set_mode((cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT))
@@ -29,7 +30,8 @@ class App():
                 if issubclass(type(obj), Interactable):
                     for event in event_list:
                         self.terminate_check(event)
-                        obj.event(event, self.observer)
+                        if obj.event(event, self.observer):
+                            return
         self.observer.active_objs["temp"] = []
         pygame.display.update()
         self.FPS_CLOCK.tick(cfg.FPS)

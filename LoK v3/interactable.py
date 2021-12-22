@@ -16,6 +16,7 @@ class Interactable:
         elif event.type == pygame.KEYUP:
             if event.key in self.trigger:
                 self.func(self.args)
+        
 
 
 class Button(Interactable):
@@ -29,12 +30,20 @@ class Button(Interactable):
 
 
 class TextBox(Interactable):
-    def __init__(self, text_obj):
+    def __init__(self, text_obj, continue_button):
         self.text_obj = text_obj
+        self.continue_button = continue_button
         super().__init__(pygame.Rect(0, 0, cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT), self.end_scroll, trigger=[pygame.MOUSEBUTTONDOWN, pygame.K_SPACE, pygame.K_RETURN])
 
     def blit(self, target):
         self.text_obj.blit(target)
+        if self.text_obj.scroll == False:
+            self.continue_button.blit(target)
+
+    def event(self, event, observer):
+        if self.text_obj.scroll == False:
+            self.continue_button.event(event, observer)
+        super().event(event, observer)
 
     def end_scroll(self, arg):
         self.text_obj.scroll = False   

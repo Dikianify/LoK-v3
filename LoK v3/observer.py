@@ -1,5 +1,6 @@
 from game import Game
 from backpack import Backpack
+from settings import Settings_Gear
 import config as cfg
 from data import Data
 from gameNode import EndNode, StartNode, HellEndNode, WinNode
@@ -8,20 +9,23 @@ from random import randint
 
 class Observer(Game):
     def __init__(self):
+        self.active_objs = {"background": [], "splash":[], "models": [], "backpack":[], "nodes":[], "gear":[], "settings":[]}
         self.data = Data()
         super().__init__(cfg.GAMEFILE)
         self.music_player = MusicPlayer(self.data.data_dict["music_vol"], self.data.data_dict["effect_vol"])
         self.backpack_obj = Backpack(cfg.BP_COORDS, self.data.data_dict["inventory"])
-        self.settings_obj = None
-        self.active_objs = {"background": [], "models": [], "backpack":[], "settings":[], "nodes":[]}
-        self.start_node = StartNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.data, self.backpack_obj)
-        win_node=WinNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data)
+        self.gear_obj = Settings_Gear(self.music_player, self.update_active_objs, self.get_active_objs, self.next_nodes, self.data)
+        self.start_node = StartNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.data, self.backpack_obj, self.gear_obj)
+        win_node = WinNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data)
         self.end_node = EndNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data, win_node = win_node)
         self.hell_end_node = HellEndNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data, win_node = win_node)
         self.update_active_objs("nodes", [self.start_node])
 
     def update_active_objs(self, key, value):
         self.active_objs[key] = value
+
+    def get_active_objs(self):
+        return self.active_objs
 
     def remove_active_obj(self, key):
         del self.active_objs[key]
@@ -63,7 +67,10 @@ class Observer(Game):
             end_node = self.hell_end_node
         else:
             end_node = self.end_node
+        self.update_active_objs("gear", [])
+        self.update_active_objs("backpack", [])
         end_node.get_end_text_box(node.data.ending)
+        end_node.reset_buttons()
         return [end_node]
 
     def inventory_check(self, node):
@@ -81,11 +88,11 @@ class Observer(Game):
         option_nodes = self.options[str(key)]
         if len(option_nodes) == 1:
             for index, node in enumerate(option_nodes):
-                node.get_text_box()
+                node.get_text_box(self.next_nodes, self.data.data_dict["box_color"])
                 option_nodes[index] = node
         else:
             for index, node in enumerate(option_nodes):
-                node.get_button(self.next_nodes)
+                node.get_button(self.next_nodes, self.data.data_dict["box_color"])
                 option_nodes[index] = node
         return option_nodes
 
@@ -94,7 +101,7 @@ class Observer(Game):
         self.data.data_dict["traversed_rows"].append(node.row_id)
         if len(node.get_children()) == 1:
             next_node = node.get_children()[0]
-            next_node.get_text_box()
+            next_node.get_text_box(self.next_nodes, self.data.data_dict["box_color"])
             next_nodes = [next_node]
         else:
             if node.data.ending != None:
@@ -105,7 +112,7 @@ class Observer(Game):
                 self.data.data_dict["option"] = next_id
                 next_nodes = self.get_option_objs(next_id)
                 if len(next_nodes) > 1:
-                    next_nodes[0].last_text_box = node.get_last_text_box()
+                    next_nodes[0].last_text_box = node.get_last_text_box(self.data.data_dict["box_color"])
                     self.data.data_dict["last_text"] = node.data.text
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)

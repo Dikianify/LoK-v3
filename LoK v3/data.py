@@ -8,7 +8,7 @@ class Data:
         if self.data_dict == None:
             self.data_dict = {
                 
-                "text_box_color":cfg.TEXT_BOX_COLOR,"text_color":cfg.TEXT_COLOR,"button_color":cfg.BUTTON_COLOR,
+                "box_color":cfg.TEXT_BOX_COLOR,"text_color":cfg.TEXT_COLOR,
                 "music_vol":100, "effect_vol":100,
                 "inventory":[],"backpack":False,"traversed_rows":[],"endings":[],"option":"0","last_text":""
                 
