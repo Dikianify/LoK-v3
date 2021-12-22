@@ -101,7 +101,7 @@ class Ribbon:
 class RibbonItem:
     def __init__(self, text, item):
         self.raw_text = text
-        self.text = TextProcessor(text, "center", 100, 100, 0, 0, adjust=True, font_size=12, text_margin=0, box_color=cfg.BLACK, opacity = 100)
+        self.text = TextProcessor(text.title(), "center", 100, 100, 0, 0, adjust=True, font_size=12, text_margin=0, box_color=cfg.BLACK, opacity = 100)
         self.item_img = item
         self.item_img.y = int(cfg.RIBBON_CENTER - self.item_img.h / 2)
 
@@ -111,5 +111,5 @@ class RibbonItem:
     def mouse_check(self, target):
         x, y = pg.mouse.get_pos()
         if self.item_img.rect.collidepoint((x, y)):
-            self.text.obj_rect.topleft = (x, y)
+            self.text.obj_rect.topleft = (x, y-self.text.obj_rect.height)
             self.text.blit(target)
