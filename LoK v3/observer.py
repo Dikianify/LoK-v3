@@ -51,8 +51,7 @@ class Observer(Game):
                     if randint(1,5) % 2 == 0:
                         return cond[1]
                     else:
-                        return cond[0][1:]
-                        
+                        return cond[0][1:]        
                 case "f":
                     for row in self.traversed_rows:
                         if row >= 142:
@@ -76,11 +75,9 @@ class Observer(Game):
     def inventory_check(self, node):
         if node.data.incoming != None:
             if node.data.incoming not in self.data.data_dict["inventory"]:
-                self.backpack_obj.inventory.append(self.backpack_obj.items[node.data.incoming])
                 self.data.data_dict["inventory"].append(node.data.incoming)
         if node.data.leaving != None:
             if node.data.leaving in self.data.data_dict["inventory"]:
-                self.backpack_obj.inventory.remove(self.backpack_obj.items[node.data.leaving])
                 self.data.data_dict["inventory"].remove(node.data.leaving)
         self.backpack_obj.update_inventory()
 

@@ -106,15 +106,15 @@ class EndNode(Interactable):
         self.game_data = data
         self.data=CellData(music="end")
         self.buttons = [
-        Button(TextProcessor("Restart", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200), self.restart, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
-        Button(TextProcessor("Main Menu", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension,opacity=200), self.main_menu, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
+        Button(TextProcessor("Restart", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200,box_color = self.game_data.data_dict["box_color"]), self.restart, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
+        Button(TextProcessor("Main Menu", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension,opacity=200,box_color = self.game_data.data_dict["box_color"]), self.main_menu, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
         ]
-        self.win_button = Button(TextProcessor("Continue", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button3_box_dimension,opacity=200), self.assign_win_node, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1])
+        self.win_button = Button(TextProcessor("Continue", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button3_box_dimension,opacity=200,box_color = self.game_data.data_dict["box_color"]), self.assign_win_node, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1])
 
     def reset_buttons(self):
         self.buttons = [
-        Button(TextProcessor("Restart", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200), self.restart, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
-        Button(TextProcessor("Main Menu", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension,opacity=200), self.main_menu, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
+        Button(TextProcessor("Restart", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200,box_color = self.game_data.data_dict["box_color"]), self.restart, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
+        Button(TextProcessor("Main Menu", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension,opacity=200,box_color = self.game_data.data_dict["box_color"]), self.main_menu, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
         ]      
 
     def event(self, event, observer):
@@ -150,7 +150,7 @@ class EndNode(Interactable):
         self.update_active_objs("nodes", [self.win_node])
 
     def get_end_text_box(self, end):
-        self.end_text_box =TextProcessor(end, "center", cfg.LAST_TEXT_BOX[2] / 1.2, cfg.LAST_TEXT_BOX[3] / 1.2, cfg.LAST_TEXT_BOX[2] * 0.6, cfg.LAST_TEXT_BOX[3] * 0.6, box = cfg.LAST_TEXT_BOX, opacity = 100, font_size = 10)
+        self.end_text_box =TextProcessor(end, "center", cfg.LAST_TEXT_BOX[2] / 1.2, cfg.LAST_TEXT_BOX[3] / 1.2, cfg.LAST_TEXT_BOX[2] * 0.6, cfg.LAST_TEXT_BOX[3] * 0.6, box = cfg.LAST_TEXT_BOX, opacity = 100, box_color = self.game_data.data_dict["box_color"], font_size = 10)
 
 class HellEndNode(EndNode):
     def __init__(self, get_option_objs, update_active_objs, update_sounds, main_menu_node, data, win_node = ""):
@@ -175,7 +175,6 @@ class StartNode(Interactable):
         self.game_data = data
         self.backpack = backpack
         self.gear = gear
-        self.last_text_box = TextProcessor(self.game_data.data_dict["last_text"], "center", cfg.LAST_TEXT_BOX[2] / 1.025, cfg.LAST_TEXT_BOX[3] / 1.05, cfg.LAST_TEXT_BOX[2] * 0.7, cfg.LAST_TEXT_BOX[3] * 0.7, box = cfg.LAST_TEXT_BOX, opacity = 100)
         self.buttons = [
         Button(TextProcessor("Continue", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension, opacity=200, box_color = self.game_data.data_dict["box_color"]), self.continue_game, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
         Button(TextProcessor("New Game", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension, opacity=200, box_color = self.game_data.data_dict["box_color"]), self.new_game, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
@@ -197,9 +196,10 @@ class StartNode(Interactable):
             button.blit(target)   
 
     def continue_game(self, arg):
+        last_text_box = TextProcessor(self.game_data.data_dict["last_text"], "center", cfg.LAST_TEXT_BOX[2] / 1.025, cfg.LAST_TEXT_BOX[3] / 1.05, cfg.LAST_TEXT_BOX[2] * 0.7, cfg.LAST_TEXT_BOX[3] * 0.7, box = cfg.LAST_TEXT_BOX, box_color=self.game_data.data_dict["box_color"],opacity = 100)
         next_nodes = self.get_option_objs(self.game_data.data_dict["option"])
         if len(next_nodes) != 1:
-            next_nodes[0].last_text_box = self.last_text_box
+            next_nodes[0].last_text_box = last_text_box
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)
         self.update_active_objs("background", [next_nodes[0].render_background()])
@@ -211,6 +211,7 @@ class StartNode(Interactable):
         self.game_data.data_dict["option"] = "0"
         self.game_data.data_dict["traversed_rows"] = []
         self.game_data.data_dict["inventory"] = []
+        self.backpack.str_inventory = []
         next_nodes = self.get_option_objs(self.game_data.data_dict["option"])
         self.update_sounds(next_nodes[0].data.music, "None")
         self.update_active_objs("background", [next_nodes[0].render_background()])

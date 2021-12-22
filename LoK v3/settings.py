@@ -44,7 +44,7 @@ class Settings(Interactable):
                 new_nodes[index] = node
         else:
             for index, node in enumerate(new_nodes):
-                if index == [0]:
+                if index == 0:
                     node.last_text_box = TextProcessor(self.data.data_dict["last_text"], "center", cfg.LAST_TEXT_BOX[2] / 1.025, cfg.LAST_TEXT_BOX[3] / 1.05, cfg.LAST_TEXT_BOX[2] * 0.7, cfg.LAST_TEXT_BOX[3] * 0.7, box = cfg.LAST_TEXT_BOX, opacity = 100, box_color = self.data.data_dict["box_color"])
                 node.get_button(self.next_nodes, self.data.data_dict["box_color"])
                 new_nodes[index] = node
@@ -112,6 +112,10 @@ class Diamond(Interactable):
             mouse_x = pg.mouse.get_pos()[0]
             if self.minx <= mouse_x <= self.maxx:
                 self.set_func(int((mouse_x - self.minx) / (self.maxx - self.minx) * 100))
+            elif self.maxx <= mouse_x:
+                self.set_func(100)
+            elif self.minx >= mouse_x:
+                self.set_func(0)
         if event.type == pg.MOUSEBUTTONUP:
             self.drag = False
 
