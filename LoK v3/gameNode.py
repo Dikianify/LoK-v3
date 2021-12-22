@@ -10,6 +10,7 @@ class GameNode(Interactable):
         self.option_id = option_id
         self.data = data
         self.children = []
+        self.rendered_models = []
         self.text_box = None
         self.continue_button = None
         self.button = None
@@ -50,7 +51,10 @@ class GameNode(Interactable):
         return self.children
 
     def render_background(self):
-        return ImageProcessor(self.data.bg, h=cfg.WINDOW_HEIGHT)
+        return ImageProcessor(self.data.bg, h=cfg.WINDOW_HEIGHT, base="bgs")
+
+    def render_models(self):
+        return [] if self.data.models == None else [ImageProcessor(model_img, h=cfg.WINDOW_HEIGHT, base="models") for model_img in self.data.models.split()]
 
     def blit(self, target):
         if self.text_box != None:
@@ -71,7 +75,7 @@ class GameNode(Interactable):
 
 
 class CellData:
-    def __init__(self, conditional=None, destination=None, text = None, incoming = None, leaving = None, ending = None, noise = "None", bg = None, music = None):
+    def __init__(self, conditional=None, destination=None, text = None, incoming = None, leaving = None, ending = None, noise = "None", models = None, bg = None, music = None):
         if conditional == None:
             conditional = []
         else:
@@ -87,6 +91,7 @@ class CellData:
         self.noise = noise
         self.bg = bg
         self.music = music
+        self.models = models
 
 
 
@@ -144,7 +149,7 @@ class EndNode(Interactable):
         self.update_active_objs("nodes", [self.main_menu_node])
 
     def render_background(self):
-        return ImageProcessor(self.game_data.data_dict["endings"][-1][7], h=cfg.WINDOW_HEIGHT)
+        return ImageProcessor(self.game_data.data_dict["endings"][-1][7], h=cfg.WINDOW_HEIGHT, base="bgs")
 
     def assign_win_node(self, arg):
         self.update_active_objs("nodes", [self.win_node])
@@ -179,6 +184,10 @@ class StartNode(Interactable):
         Button(TextProcessor("Continue", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension, opacity=200, box_color = self.game_data.data_dict["box_color"]), self.continue_game, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1]),
         Button(TextProcessor("New Game", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button2_box_dimension, opacity=200, box_color = self.game_data.data_dict["box_color"]), self.new_game, trigger = [pg.MOUSEBUTTONDOWN, pg.K_2]),
         ]
+        self.update_active_objs("background", [self.render_background()])
+
+    def render_background(self):
+        return ImageProcessor("mainmenu", h=cfg.WINDOW_HEIGHT, base="bgs")
 
     def reset_buttons(self):
         self.buttons = [
@@ -203,6 +212,7 @@ class StartNode(Interactable):
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)
         self.update_active_objs("background", [next_nodes[0].render_background()])
+        self.update_active_objs("models", next_nodes[0].render_models())
         self.update_active_objs("gear", [self.gear])
         if self.game_data.data_dict["backpack"] == True:
             self.update_active_objs("backpack", [self.backpack])

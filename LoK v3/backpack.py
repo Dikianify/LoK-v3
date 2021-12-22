@@ -5,18 +5,18 @@ import config as cfg
 import pygame as pg
 
 class Backpack(Interactable):
-    def __init__(self, coords, inventory):
+    def __init__(self, coords, data):
         super().__init__(pg.Rect(coords), self.on_press, trigger = [pg.MOUSEBUTTONDOWN, pg.K_b])
         self.state = "closed"
         self.bp_img = ImageProcessor("backpack", h=cfg.BP_HEIGHT, x=cfg.BP_X, y=cfg.BP_Y)
         self.ribbon = Ribbon(self)
         self.items = {item:RibbonItem(item, ImageProcessor(item, h=cfg.ITEM_HEIGHT, max_w = self.ribbon.parts)) for item in cfg.RIBBON_ITEM}
-        self.str_inventory = inventory
+        self.data = data
         self.update_inventory()
 
     @property
     def inventory(self):
-        return [self.items[item] for item in self.str_inventory]
+        return [self.items[item] for item in self.data.data_dict["inventory"]]
 
     def on_press(self, arg):
         if self.state == "closed" or self.state == "closing":

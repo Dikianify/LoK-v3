@@ -13,7 +13,7 @@ class Observer(Game):
         self.data = Data()
         super().__init__(cfg.GAMEFILE)
         self.music_player = MusicPlayer(self.data.data_dict["music_vol"], self.data.data_dict["effect_vol"])
-        self.backpack_obj = Backpack(cfg.BP_COORDS, self.data.data_dict["inventory"])
+        self.backpack_obj = Backpack(cfg.BP_COORDS, self.data)
         self.gear_obj = Settings_Gear(self.music_player, self.update_active_objs, self.get_active_objs, self.next_nodes, self.data)
         self.start_node = StartNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.data, self.backpack_obj, self.gear_obj)
         win_node = WinNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data)
@@ -114,6 +114,7 @@ class Observer(Game):
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)
         self.update_active_objs("background", [next_nodes[0].render_background()])
+        self.update_active_objs("models", next_nodes[0].render_models())
         self.data.save()
 
     def update_sounds(self, music, sound):

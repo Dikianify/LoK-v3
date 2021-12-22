@@ -28,6 +28,6 @@ class MusicPlayer:
             self.music = mus    
 
     def play_sound(self, sound):
-        sound_effect = pg.mixer.Sound(os.path.join("data", "sounds", "noises", sound + ".mp3"))
+        sound_effect = pg.mixer.Sound(os.path.join("data", "sounds", "effects", sound + ".mp3"))
         sound_effect.set_volume(self.effect_volume/100)
-        pg.mixer.effect.play()
+        sound_effect.play()

@@ -4,11 +4,11 @@ import config as cfg
 from displayObject import DisplayObject
 
 class ImageProcessor(DisplayObject):
-    def __init__(self, name, h=None, x = 0, y = 0, max_w=None):
+    def __init__(self, name, h=None, x = 0, y = 0, base="assets",max_w=None):
         self.name = name
-        self.path = os.path.join("data/assets", name)
+        self.path = os.path.join("data", base, name+".png")
         self.max_w = max_w
-        self.img = self.image_setup(self.path, h).convert_alpha()
+        self.img = self.image_setup(h).convert_alpha()
         super().__init__((x, y, self.img.get_width(), self.img.get_height()))
 
     def __repr__(self):
@@ -21,7 +21,7 @@ class ImageProcessor(DisplayObject):
     def fit(self, image, w, h):
         return pg.transform.scale(image, (w, h))
 
-    def image_setup(self, name, h):
+    def image_setup(self, h):
         
         # image scaled to the height inputted. Width is determined 
         # by the ratio of the original image's dimensions. If the 
@@ -32,18 +32,14 @@ class ImageProcessor(DisplayObject):
         # output:
         #   img - transformed image
 
-        try:
-            file = os.path.join("data", "assets", self.name + ".png")
-            image = pg.image.load(file).convert_alpha()
-        except:
-            file = os.path.join("data", "bgs", self.name + ".png")
-            image = pg.image.load(file).convert_alpha()
+        image = pg.image.load(self.path).convert_alpha()
         h = image.get_height() if h == None else h
         img_w, img_h = pg.Surface.get_width(image), pg.Surface.get_height(image)
         w = int(h / img_h * img_w)
-        w, h = self.get_ribbon_item_dim(image, h, img_h, img_w) if name in cfg.RIBBON_ITEM else w, h
+        if self.name in cfg.RIBBON_ITEM:
+            w, h = self.get_ribbon_item_dim(h, img_h, img_w)
         if self.max_w != None:
-            if w > self.max_w:
+            if w > int(self.max_w):
                 scale = w / self.max_w
                 h = h / scale
                 w = self.max_w
@@ -51,8 +47,8 @@ class ImageProcessor(DisplayObject):
 
     def get_ribbon_item_dim(self, h, img_h, img_w):
         w = int(h / img_h * img_w)
-        if h + 10 < w:
-            return h, int((h / img_w)) * img_h
+        # if h + 10 < w:
+        #     return h, int((h / img_w) * img_h)
         return w, h
 
     def blit(self, target):
