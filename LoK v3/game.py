@@ -18,7 +18,7 @@ class Game:
         end_nodes = []
         options = {}
         cell = self.file_text_ws.cell
-        for i in range(2,self.file_text_ws.max_row):
+        for i in range(2,self.file_text_ws.max_row+1):
             # acquiring option data
             option_node = GameNode(row_id=i,option_id=cell(i, 1).value,data=CellData(conditional=cell(i, 3).value,destination=cell(i, 4).value,incoming=cell(i, 17).value,leaving=cell(i, 18).value,ending=cell(i, 19).value,text = self.file_text_ws.cell(i, 2).value, noise = self.file_wb['sounds'].cell(i, 2).value, models = self.file_wb['models'].cell(i, 2).value, bg = self.file_wb['bgs'].cell(i, 2).value, music = self.file_wb['music'].cell(i, 2).value))
             if str(cell(i,1).value) not in options:

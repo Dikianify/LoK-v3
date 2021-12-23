@@ -104,9 +104,10 @@ class EndNode(Interactable):
     button2_box_dimension = (BUTTON_WIDTH + BUTTON_MARGIN * 2, cfg.BUTTON_Y, BUTTON_WIDTH, cfg.BUTTON_BASE_HEIGHT)
     button3_box_dimension = (cfg.WINDOW_WIDTH/2 - BUTTON_WIDTH/2, cfg.BUTTON_Y, BUTTON_WIDTH, cfg.BUTTON_BASE_HEIGHT)
 
-    def __init__(self, get_option_objs, update_active_objs, update_sounds, main_menu_node, data, win_node = ""):
+    def __init__(self, get_option_objs, update_active_objs, update_sounds, main_menu_node, data, gear=[], win_node = ""):
         self.get_option_objs, self.update_active_objs, self.update_sounds = get_option_objs, update_active_objs, update_sounds
         self.main_menu_node = main_menu_node
+        self.gear = gear
         self.win_node = win_node
         self.game_data = data
         self.data=CellData(music="end")
@@ -139,7 +140,8 @@ class EndNode(Interactable):
         next_nodes = self.get_option_objs("0")
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)
-        self.update_active_objs("backgrounds", [next_nodes[0].render_background()])
+        self.update_active_objs("gear", [self.gear])
+        self.update_active_objs("background", [next_nodes[0].render_background()])
         self.update_active_objs("models", next_nodes[0].render_models())
         self.game_data.data_dict["backpack"] = False
         self.game_data.data_dict["traversed_rows"] = []
@@ -161,9 +163,12 @@ class EndNode(Interactable):
         self.end_text_box =TextProcessor(end, "center", cfg.LAST_TEXT_BOX[2] / 1.2, cfg.LAST_TEXT_BOX[3] / 1.2, cfg.LAST_TEXT_BOX[2] * 0.6, cfg.LAST_TEXT_BOX[3] * 0.6, box = cfg.LAST_TEXT_BOX, opacity = 100, box_color = self.game_data.data_dict["box_color"], font_size = 10)
 
 class HellEndNode(EndNode):
-    def __init__(self, get_option_objs, update_active_objs, update_sounds, main_menu_node, data, win_node = ""):
+    def __init__(self, get_option_objs, update_active_objs, update_sounds, main_menu_node, data, backpack, gear, win_node = ""):
         super().__init__(get_option_objs, update_active_objs, update_sounds, main_menu_node, data, win_node = win_node)
         self.buttons[0] = Button(TextProcessor("Try Again", "center", self.BUTTON_WIDTH * 0.9, cfg.BUTTON_BASE_HEIGHT * 0.85, self.BUTTON_WIDTH * 0.72, cfg.BUTTON_BASE_HEIGHT * 0.425, box=self.button1_box_dimension,opacity=200), self.try_again, trigger = [pg.MOUSEBUTTONDOWN, pg.K_1])
+        self.backpack = backpack
+        self.gear = gear
+
 
     def reset_buttons(self):
         self.buttons = [
@@ -175,7 +180,9 @@ class HellEndNode(EndNode):
         next_nodes = self.get_option_objs("706")
         self.update_sounds(next_nodes[0].data.music, next_nodes[0].data.noise)
         self.update_active_objs("nodes", next_nodes)
-        self.update_active_objs("backgrounds", [next_nodes[0].render_background()])
+        self.update_active_objs("background", [next_nodes[0].render_background()])
+        self.update_active_objs("backpack", [self.backpack])
+        self.update_active_objs("gear", [self.gear])
         self.update_active_objs("models", next_nodes[0].render_models())
 
 class StartNode(Interactable):

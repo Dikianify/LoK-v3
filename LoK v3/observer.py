@@ -17,8 +17,8 @@ class Observer(Game):
         self.gear_obj = Settings_Gear(self.music_player, self.update_active_objs, self.get_active_objs, self.next_nodes, self.data)
         self.start_node = StartNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.data, self.backpack_obj, self.gear_obj)
         win_node = WinNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data)
-        self.end_node = EndNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data, win_node = win_node)
-        self.hell_end_node = HellEndNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data, win_node = win_node)
+        self.end_node = EndNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data, gear=self.gear_obj, win_node = win_node)
+        self.hell_end_node = HellEndNode(self.get_option_objs, self.update_active_objs, self.update_sounds, self.start_node, self.data, self.backpack_obj, self.gear_obj, win_node = win_node)
         self.update_active_objs("nodes", [self.start_node])
 
     def update_active_objs(self, key, value):
@@ -45,8 +45,9 @@ class Observer(Game):
                     if cond[0][1:] in self.data.data_dict["inventory"]:
                         return cond[1]
                 case "e":
-                    if cond[0][1:] in self.data.data_dict["endings"]:
-                        return cond[1]
+                    for ending in self.data.data_dict["endings"]:
+                        if str(cond[0][1:]) in ending:
+                            return cond[1]
                 case "h":
                     if randint(1,5) % 2 == 0:
                         return cond[1]
@@ -61,7 +62,7 @@ class Observer(Game):
                 case "f":
                     for row in self.data.data_dict["traversed_rows"]:
                         if row >= 142:
-                            self.traversed_rows.remove(row)
+                            self.data.data_dict["traversed_rows"].remove(row)
                         if "bone" in self.data.data_dict["inventory"]:
                             self.data.data_dict["inventory"].remove("bone")
         return default_destination

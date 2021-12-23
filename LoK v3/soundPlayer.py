@@ -23,6 +23,7 @@ class MusicPlayer:
     def set_music(self, mus):
         if self.music != mus:
             mus_path = os.path.join("data", "sounds", "ost", mus + ".mp3")
+            pg.mixer.music.fadeout(400)
             pg.mixer.music.load(mus_path)
             pg.mixer.music.play(30)
             self.music = mus    
