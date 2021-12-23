@@ -144,11 +144,13 @@ class EndNode(Interactable):
         self.update_active_objs("background", [next_nodes[0].render_background()])
         self.update_active_objs("models", next_nodes[0].render_models())
         self.game_data.data_dict["backpack"] = False
+        self.game_data.data_dict["inventory"] = []
         self.game_data.data_dict["traversed_rows"] = []
 
     def main_menu(self, arg):
         self.game_data.data_dict["option"] = "0"
         self.game_data.data_dict["backpack"] = False
+        self.game_data.data_dict["inventory"] = []
         self.main_menu_node.reset_buttons()
         self.update_active_objs("nodes", [self.main_menu_node])
         self.update_active_objs("background", [self.main_menu_node.render_background()])
@@ -239,7 +241,7 @@ class StartNode(Interactable):
         self.game_data.data_dict["option"] = "0"
         self.game_data.data_dict["traversed_rows"] = []
         self.game_data.data_dict["inventory"] = []
-        self.backpack.str_inventory = []
+        self.game_data.data_dict["endings"] = []
         next_nodes = self.get_option_objs(self.game_data.data_dict["option"])
         self.update_sounds(next_nodes[0].data.music, "None")
         self.update_active_objs("background", [next_nodes[0].render_background()])
